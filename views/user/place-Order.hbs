@@ -1,0 +1,109 @@
+<section>
+    <div class="container mt-5" style="background-color: #2c3e50; padding: 2rem; border-radius: 10px;">
+        <form action="" id="checkout-form">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 style="color: #ecf0f1;">Enter Delivery Details</h2><br>
+                    <div>
+                        <label for="address" style="color: #ecf0f1;">Address</label>
+                        <input class="form-control" type="text" id="address" name="address" style="background-color: #34495e; color: #ecf0f1;">
+                        <label for="pincode" style="color: #ecf0f1;">Pincode</label>
+                        <input class="form-control" type="text" id="pincode" name="pincode" style="background-color: #34495e; color: #ecf0f1;">
+                        <label for="mobile" style="color: #ecf0f1;">Mobile</label>
+                        <input class="form-control" type="text" id="mobile" name="mobile" style="background-color: #34495e; color: #ecf0f1;">
+                        <input type="text" name="userId" value="{{user._id}}" hidden>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="container mt-5 ml-5 checkout" style="background-color: #34495e; border: 1px solid #ecf0f1; border-radius: 10px; padding: 30px;">
+                        <h5 style="color: #ecf0f1;">Total Amount: Rs.{{total}}</h5>
+                        <hr style="border-color: #ecf0f1;">
+                        <div class="payment">
+                            <p style="color: #ecf0f1;">Payment method</p>
+                            <label class="radio-inline" style="color: #ecf0f1;">
+                                <input type="radio" name="payment-method" value="COD" checked> COD
+                            </label>
+                            <label class="radio-inline mt-2" style="color: #ecf0f1;">
+                                <input type="radio" name="payment-method" value="ONLINE"> Online payment
+                            </label>
+                            <button class="order-button float-right" onclick="placeOrder()" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    $("#checkout-form").submit((e) => {
+        e.preventDefault();
+        $.ajax({
+            url: '/place-Order',
+            method: 'post',
+            data: $('#checkout-form').serialize(),
+            success: (Response) => {
+                if (Response.status) {
+                    confirm('Press OK to place order!');
+                    location.href = "/order-success";
+                }
+            }
+        });
+    });
+
+    function placeOrder() {
+        const button = document.querySelector('.order-button');
+        button.classList.add('placed');
+        setTimeout(() => {
+            button.classList.remove('placed');
+        }, 500);
+    }
+</script>
+
+<style>
+    input[type=radio] {
+        width: 20px;
+        height: 20px;
+    }
+    label.radio-inline {
+        display: flex;
+        align-items: center;
+    }
+    .checkout {
+        padding: 30px;
+    }
+    .payment {
+        padding-bottom: 16px;
+    }
+    .order-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #e74c3c;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .order-button:active {
+        transform: scale(1.1);
+        background-color: #c0392b;
+    }
+    .order-button.placed {
+        animation: orderPlaced 0.5s forwards;
+    }
+    @keyframes orderPlaced {
+        0% {
+            transform: scale(1);
+            background-color: #e74c3c;
+        }
+        50% {
+            transform: scale(1.2);
+            background-color: #c0392b;
+        }
+        100% {
+            transform: scale(1);
+            background-color: #e74c3c;
+        }
+    }
+</style>

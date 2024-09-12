@@ -1,0 +1,83 @@
+<section>
+    <div class="container mt-5" style="background-color: #1a1a1a; padding: 2rem; border-radius: 10px;">
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}}
+                <tr>
+                    <td><img style="width: 70px; height: 70px;" src="/product-images/{{this.product._id}}.jpg" alt=""></td>
+                    <td>{{this.product.Name}}</td>
+                    <td>Rs.{{this.product.Price}}</td>
+                    <td>
+                        <div id="quantityDisplay">
+                            <button class="btn btn-secondary btn-sm" onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user}}',-1)">-</button>
+                            <span id="{{this.product._id}}">{{this.quantity}}</span>
+                            <button class="btn btn-secondary btn-sm" onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user}}',1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')">Remove</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <hr>
+        <div class="float-right pr-5">
+            <h5 class="float-right mr-5" style="color: #ecf0f1;">Total amount: Rs.<span id="total">{{total}}</span></h5>
+            <a href="/place-order" class="btn btn-success mt-3" style="width: 100%; background-color: #e74c3c; border: none;">Place Order</a>
+        </div>
+    </div>
+</section>
+
+<script>
+   function changeQuantity(cartId,proId,userId,count){
+    let quantity=parseInt(document.getElementById(proId).innerHTML)
+    count=parseInt(count)
+    $.ajax({
+        url:'/change-product-quantity',
+        data:{
+            user:userId,
+            cart:cartId,
+            product:proId,
+            count:count,
+            quantity:quantity
+        },
+        method:'post',
+        success:(Response)=>{
+          if(Response.removeProduct){
+            alert("product removed from cart")
+            location.reload()
+          }else{
+            console.log(Response);
+            document.getElementById(proId).innerHTML=quantity+count
+            document.getElementById('total').innerHTML=Response.total
+          }
+        }
+    })
+}
+function removeCartProduct(cartId,proId){
+    $.ajax({
+        url:'/remove-cart-product',
+        data:{
+            cart:cartId,
+            product:proId
+        },
+        method:'post',
+        success:(Response)=>{
+            if(Response.removeProduct){
+                alert("product removed from cart")
+                location.reload()
+            }
+        }
+    })
+}
+</script>
